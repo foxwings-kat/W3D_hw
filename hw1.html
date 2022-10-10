@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+.tree {
+  width: 60%;
+  height: 100%;
+  position: absolute;
+  z-index:1;
+}
+.symbol {
+  position: absolute;
+  margin-left:26.5%;
+  margin-top:-5%;
+  font-size:1000%;
+  z-index:2;
+}
+.padoru {
+  position: absolute;
+  margin-top:20%;
+  z-index:4;
+}
+</style>
+</head>
+
+<body> 
+<a> 410806129 I4A29 Hw1 </a>
+<marquee behavior="scroll" direction="left" scrollamount="50" class="padoru">
+    <img src="https://i.imgur.com/dF8N2dm.gif"/>
+</marquee>
+<button id="lightSwitch" onclick="lightSwitch()">
+      開/關
+</button>
+<button id="dutyCycleSwitch" onclick="dutyCycleSwitch()">
+      間隔0.5/間隔1~2
+</button>
+
+<div id="bkgd">
+<img class="tree" src="https://i.imgur.com/1rPtk8E.jpg">
+<p class="symbol" id ="star" >★</p>
+</div>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+class Lamp {
+
+  constructor(name) {
+    this.name = name + Lamp.id++;
+    this.myStatus = false;
+	this.isRandomDutyCycle = false;
+	this.isTurnOn = false;
+	this.randomBlinkInterval = 500;
+	this.switchInterval;
+    
+    let el = document.createElement ('div');
+    el.id = this.name;
+    //let text = document.createTextNode (name + ' is OFF');
+    //el.appendChild(text);
+    let bkgd = document.getElementById('bkgd');
+    bkgd.appendChild(el);
+    this.hue = Math.random()*360;
+
+    // styles
+    el.setAttribute ("style", `background-color: hsl(${this.hue}, 0%, 50%); width:3vmin; height:3vmin; border-radius: 100%`);
+    
+    this.top = Math.random()*0.8;
+	this.left = (this.top*((Math.random()*2)-1.0));
+	//this.left
+    el.style.position = "absolute";
+	el.style.zIndex  = "3";
+    el.style.left = (30 + (this.left*18)) + '%'; 
+    el.style.top = ((this.top*75)+25) + '%';
+  }
+
+  toggle() {
+    this.myStatus = ! this.myStatus;
+    if (this.myStatus === true) {
+      $('#'+this.name).css('backgroundColor', `hsl(${this.hue},100%,50%)`);
+      //$('#'+this.name).text(this.name + ' is on');
+    } else {
+      $('#' + this.name).css('backgroundColor', `hsl(${this.hue},0%,50%)`);
+      //$('#'+this.name).text(this.name + ' is off');
+    }
+  }
+
+  startBlink() {
+    var that = this;
+	
+	if(this.isRandomDutyCycle === true){
+		this.randomBlinkInterval = getRandom(1000,2000);
+		console.log(this.randomBlinkInterval);
+	}
+	if(this.isRandomDutyCycle === false){
+		this.randomBlinkInterval = 500;
+		console.log(this.randomBlinkInterval);
+	}
+	
+	this.switchInterval = setInterval(function() {
+		that.toggle();
+	}, this.randomBlinkInterval);	
+  }
+  
+
+}
+
+
+Lamp.id = 0; // class variable
+var lights = [];
+for (let i = 0; i < 20; i++) {
+   let ll = new Lamp ('light');
+   lights.push(ll);
+}
+
+function dutyCycleSwitch(){
+	console.log("DutyCycleChange");
+	lights.forEach((item) => {
+		item.isRandomDutyCycle = !item.isRandomDutyCycle;
+		clearInterval(item.switchInterval);
+		$('#' + item.name).css('backgroundColor', `hsl(${item.hue},0%,50%)`);
+		
+		var star = document.getElementById("star");
+		star.setAttribute('style','position: absolute; margin-left:26.5%; margin-top:-5%; color:yellow;');
+		
+		item.myStatus = false;
+		item.startBlink();
+		item.isTurnOn = true;
+	});
+}
+
+function lightSwitch(){
+	console.log("lightSwitchClick");
+	lights.forEach((item) => {
+		var star = document.getElementById("star");
+		item.isTurnOn = !item.isTurnOn;
+		if(item.isTurnOn === false){
+			clearInterval(item.switchInterval);
+			$('#' + item.name).css('backgroundColor', `hsl(${item.hue},0%,50%)`);
+			item.myStatus = false;
+			star.setAttribute('style','position: absolute; margin-left:26.5%; margin-top:-5%; color:black;');
+		}else {
+			star.setAttribute('style','position: absolute; margin-left:26.5%; margin-top:-5%; color:yellow;');
+			item.startBlink();
+		}
+	});
+}
+
+function getRandom(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+};
+
+</script>
+</body>
+
+</html>
