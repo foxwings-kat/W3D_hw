@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+.block {
+  border-style: solid;
+  border-radius: 2vmin;
+  margin: 1vmin;
+  padding: 2vmin;
+  width: fit-content;
+  display: block;
+}
+.text{
+  font-size: 20px;
+}
+.title {
+  text-align: center;
+  font-size: 30px;
+}
+input {
+  font-size: 20px;
+  margin-left: 5px;
+} 
+</style>
+</head>
+
+<body> 
+<a> 410806129 I4A29 Hw2 </a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<table>
+    <tr>
+        <td>
+			<div class = "block">
+				<div class = "title">
+					v
+				</div>
+				<br>
+				<div class = "text">
+					x <input id="vx" type="number" value=0>
+				</div>
+				<div class = "text">
+					y <input id="vy" type="number" value=0>
+				</div>
+				<div class = "text">
+					z <input id="vz" type="number" value=0>
+				</div>
+			</div>
+			<div class = "block">
+				<div class = "title">
+					w
+				</div>
+				<br>
+				<div class = "text">
+					x <input id="wx" type="number" value=0>
+				</div>
+				<div class = "text">
+					y <input id="wy" type="number" value=0>
+				</div>
+				<div class = "text">
+					z <input id="wz" type="number" value=0>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div class = "block">
+				<div class = "title">
+					inner product
+				</div>
+				<div class = "title">
+					v⋅w 
+				</div>
+				<br>
+				<input id="vwoutput" type="number" value=0 disabled>
+				<div class = "title">
+					v×w (vector product)
+				</div>
+				<br>
+				<div class = "text">
+					x <input  id="vwX" type="number" value=0 disabled>
+				</div>
+				<div class = "text">
+					y <input  id="vwY" type="number" value=0 disabled>
+				</div>
+				<div class = "text">
+					z <input  id="vwZ" type="number" value=0 disabled>
+				</div>
+			</div>
+		</td>
+    <tr>
+</table>
+
+<script>
+	var v = new THREE.Vector3();
+	var w = new THREE.Vector3();
+	var vw = new THREE.Vector3();
+
+	var vx = document.querySelector('#vx');
+	var vy = document.querySelector('#vy');
+	var vz = document.querySelector('#vz');
+
+	var wx = document.querySelector('#wx');
+	var wy = document.querySelector('#wy');
+	var wz = document.querySelector('#wz');
+
+	var vwoutput = document.querySelector('#vwoutput');
+
+	var vwX = document.querySelector('#vwX');
+	var vwY = document.querySelector('#vwY');
+	var vwZ = document.querySelector('#vwZ');
+
+	if (vx.value === '') {
+	  vx.value = 0;
+	}
+	if (vy.value === '') {
+	  vy.value = 0;
+	}
+	if (vz.value === '') {
+	  vz.value = 0;
+	}
+	
+	if (wx.value === '') {
+	  wx.value = 0;
+	}
+	if (wy.value === '') {
+	  wy.value = 0;
+	}
+	if (wz.value === '') {
+	  wz.value = 0;
+	}
+
+	vx.onchange = function(){
+		v.setX(vx.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+	vy.onchange = function(){
+		v.setY(vy.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+	vz.onchange = function(){
+		v.setZ(vz.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+
+	wx.onchange = function(){
+		w.setX(wx.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+	wy.onchange = function(){
+		w.setY(wy.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+	wz.onchange = function(){
+		w.setZ(wz.value);
+		vwoutput.value=v.dot(w);
+		vw.crossVectors(v,w);
+		vwX.value=vw.x;
+		vwY.value=vw.y;
+		vwZ.value=vw.z;
+	};
+
+	vwoutput.value=v.dot(w);
+	vw.crossVectors(v,w);
+	vwX.value=vw.x;
+	vwY.value=vw.y;
+	vwZ.value=vw.z;
+	
+</script>
+</body>
+
+</html>
