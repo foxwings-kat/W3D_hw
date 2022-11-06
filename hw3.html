@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			  I4A29 Art Gallery
+		</title>
+	<style>
+		.div_block{
+			position: absolute;
+			top: 10px;
+			left : 20px;
+			font-size: 36px;
+		}
+		button{
+			height:36px;
+			width:100px;
+		}
+		.slider{
+			width: 200px;
+		}
+	</style>
+	</head>
+	<body> 
+		<div class="div_block">
+			Web3D技術概論 410806129 I4A29 周立 <br>
+			Homework 3: 室內設計模型 (1) <a href="https://i.imgur.com/xvK45Bs.jpg">設計圖</a> <br>
+			<button id="lightSwitch" onclick="clickLightSwitch()">light On/Off</button>
+			<button onclick="vp(2000, 2500, 2500)">View Point 1</button>
+			<button	onclick="vp(2100, 1000, 500)">View Point 2</button>
+			<button	onclick="vp(-2100, 1000, 500)">View Point 3</button>
+			<button	onclick="vp(0, 200, 2500)">View Point 4</button>
+			<button	onclick="vp(0, 800, 1300, 0, 500, 2000)">View Point 5</button>
+			<br>
+			<a> 亮度<input id="lightBrightness" type="range" min="0" max="100" value="50" class="slider"> </a>
+			
+		</div>	
+		<script src="https://threejs.org/build/three.min.js"></script>
+		<!-- script src="https://unpkg.com/three@0.128.0/build/three.js"></script>
+		<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script-->
+		<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+		<script src="./js/ArtGallery.js"></script>
+		
+		
+	</body>
+</html>
