@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>
+			  I4A29 Patio
+		</title>
+		<style>
+			#container {
+			  width: 60vw;
+			  height: 60vw;
+			  float: left;
+			  background-color: pink;
+			  margin: 10px;
+			}
+			p {
+			  margin: 10px;
+			  text-align: justify;
+			}
+		</style>
+	</head>
+	<body> 
+		<h1 style="font-size:2em; text-align:center; margin:15px">
+		  I4A29 Homework 4: Patio Design
+		</h1>
+		<div id="container"></div>
+
+		<div style="width:20vw;float:left; margin:10px;background-color:yellow;font-size: 150%;">
+		  <p>選擇物品</p>
+		  <input type=radio class='oclass' name='o' value='table' checked> table <br>
+		  <input type=radio class='oclass' name='o' value='chair'> chair<br>
+		  <input type=radio class='oclass' name='o' value='bench'> bench<br>
+		  
+		  <p>動作</p>
+		  <input type=radio class='gclass' id='placing' name='g' value='place' checked> Place <br>
+		  <input type=radio class='gclass' name='g' value='move'> Move<br>
+		  <input type=radio class='gclass' name='g' value='delete'> Delete<br>
+		  <input type=radio class='gclass' name='g' value='rotate'> Rotate<br>
+		  <a>點選物品 旋轉角度(0~360)<br><input id="rotate_ang" type="range" min="0" max="360" value="0" class="slider">
+		  <input type="number" id="rotate_n" value="0">
+		  
+		  <br>
+		  <button id='save'>Save</button>
+		  <button id='clear'>Clear</button>
+		  <button id='restore'>Restore</button>
+		  </p>
+		</div>
+		
+
+		<script src="https://threejs.org/build/three.min.js"></script>
+		<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="./js/Patio.js"></script>
+	</body>
+</html>
