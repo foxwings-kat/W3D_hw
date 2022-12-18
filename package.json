@@ -1,0 +1,23 @@
+{
+  "name": "3w3d",
+  "version": "1.0.0",
+  "description": "_火腿的相反是什麼東西?  -水手_",
+  "main": "main-win.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kakatsudon/I4A29_3W3D_HW.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kakatsudon/I4A29_3W3D_HW/issues"
+  },
+  "homepage": "https://github.com/kakatsudon/I4A29_3W3D_HW#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "shelljs": "^0.8.5"
+  }
+}
