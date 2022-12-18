@@ -1,0 +1,204 @@
+<html>
+	<head>
+		<title>
+			  I4A29 node.js
+		</title>
+		<style>
+			#info {
+			  position: absolute;
+			  top: 0px;
+			  width: 100%;
+			  padding: 10px;
+			  text-align: center;
+			  color: #ffff00
+			}
+
+			body {
+			  overflow: hidden;
+			}
+			#container {
+			  width: 45vw;
+			  height: 45vw;
+			  float: left;
+			  background-color: pink;
+			  margin: 10px;
+			}
+			.button {
+			  padding: 15px 32px;
+			  text-align: center;
+			  font-size: 16px;
+			}
+			.checkbox {
+            width: 20px;
+            height: 20px;
+			}
+			.slider {
+			  overflow: hidden;
+			  width: 20%;
+			}
+		</style>
+	</head>
+	<body> 
+		<div id="container"></div>
+		
+		<div style="width:50vw;float:left; margin:10px;font-size: 200%;">
+			<a style="font-size:150%;">I4A29 Homework 5: node.js</a>
+			<br>
+			<a>Radius  <input id="radius" type="range" min="0" max="50" value="10" class="slider">
+			<br>
+			<a>Sound   <input type="checkbox" id="sound" name="sound" class="checkbox" checked>
+			<br>
+			<button class="button">Start/Stop</button>
+			<br>
+			<button class="debugBTN">debug</button>
+			<br><br>
+			<iframe width="640" height="360" src="https://www.youtube.com/embed/qKyis1c66nE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+		</div>
+		
+		
+
+		<script src="https://threejs.org/build/three.min.js"></script>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script>
+		$('.debugBTN').click( function() {
+			var debug = "circle.x/y "+circle.position.x + " " + circle.position.y + " circle.r " + radius + " rec.min.x/y " +  ((mouse.x * 100)-10) + " " + ((mouse.y * 100)-10) + " rec.max.x/y " + ((mouse.x * 100)+10) + " " + ((mouse.y * 100)+10);
+			console.log("debug = "+debug);
+		});
+		$('.button').click( function() {
+			isStart = !isStart;
+			console.log("isStart = "+isStart);
+		});
+
+		$('.checkbox').click( function() {
+			isSoundOn = !isSoundOn;
+			console.log("isSoundOn = "+isSoundOn);
+		});
+
+		document.querySelector('#radius').onchange = function() {
+		  radius = (this.value);
+		  circle.removeFromParent ();
+		  circle = new THREE.Mesh(new THREE.CircleGeometry(radius, 20, 20), new THREE.MeshBasicMaterial({
+			color: 'yellow'
+		  }));
+		  scene.add(circle);
+		  console.log("radius = "+radius);
+		};
+		var isCollide = false;
+		var isCollideTemp = false; 
+		var isStart = true;
+		var isSoundOn = true;
+		var radius = 10;
+		var camera, scene, renderer;
+		var circle, pos, vel;
+		var mouse = new THREE.Vector2();
+		var raycaster = new THREE.Raycaster();
+		var sound = new Audio('https://cdn.discordapp.com/attachments/576498638121861127/1054037508461183088/roblox-death-sound_1.mp3');
+		sound.playbackRate = 5;
+		$('#container').on("pointermove", onMouseMove);
+
+		init();
+		animate();
+
+		function init() {
+
+		  scene = new THREE.Scene();
+		  
+		  
+		  renderer = new THREE.WebGLRenderer();
+		  
+		  var ww = $('#container').innerWidth();
+		  var hh = $('#container').innerHeight();
+		  renderer.setSize(ww, hh);
+		  
+		  renderer.setClearColor(0x888888);
+		  //document.body.appendChild(renderer.domElement);
+		  
+		  $('#container').append(renderer.domElement);
+		  
+		  camera = new THREE.OrthographicCamera(-100, 100, 100, -100, -10, 100);
+		  camera.position.z = 50;
+
+		  ////////////////////////////////////////////////////////
+		  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+		  gridXZ.rotation.x = Math.PI / 2;
+		  scene.add(gridXZ);
+
+		  let geometry = new THREE.BufferGeometry();
+		  let points = [];
+		  points.push(
+			new THREE.Vector3(-80, -80, 0),
+			new THREE.Vector3(80, -80, 0),
+			new THREE.Vector3(80, 80, 0),
+			new THREE.Vector3(-80, 80, 0),
+			new THREE.Vector3(-80, -80, 0));
+		  geometry.setFromPoints(points);
+		  var border = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+			color: 'blue'
+		  }));
+		  scene.add(border);
+
+		  circle = new THREE.Mesh(new THREE.CircleGeometry(radius, 20, 20), new THREE.MeshBasicMaterial({
+			color: 'yellow'
+		  }));
+		  scene.add(circle);
+		  
+		  plane = new THREE.Mesh(new THREE.PlaneGeometry( 20, 20 ), new THREE.MeshBasicMaterial({color: 'green'}));
+		  scene.add(plane);
+
+		  pos = new THREE.Vector3();
+		  vel = new THREE.Vector3(10, 20);
+		}
+
+		function animate() {
+		  
+			var dt = 0.05;
+			requestAnimationFrame(animate);
+			renderer.render(scene, camera);
+			if (isStart == true){
+			  pos.add(vel.clone().multiplyScalar(dt));
+			  if (pos.x > (80-radius) || pos.x < -(80-radius))
+				vel.x *= -1;
+			  if (pos.y > (80-radius) || pos.y < -(80-radius))
+				vel.y *= -1;
+
+			  
+
+			  circle.position.copy(pos);
+		  }
+			var string = circle.position.x + " " + circle.position.y + " " + radius + " " + ((mouse.x * 100)-10) + " " + ((mouse.y * 100)-10) + " " + ((mouse.x * 100)+10) + " " + ((mouse.y * 100)+10);
+			$.get( "http://127.0.0.1:1337/api?argv="+ string, function( data ) {
+				if(data && data.output){
+						console.log(data.output);
+						if(data.output==1){isCollide = true;}
+						else{isCollide = false;}
+					}
+				});
+			
+			if(isCollide == false){
+				circle.material.color.set('yellow');
+				isCollideTemp = false;
+			}
+			if(isCollide == true){
+				if(isSoundOn == true && isCollideTemp == false) sound.play();
+				circle.material.color.set('red');
+				isCollideTemp = true;
+			}
+		}
+
+		function onMouseMove(event) {
+		  event.preventDefault();
+		  
+
+		  var viewportPos = $('#container').get(0).getBoundingClientRect();
+		  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+		  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+		  raycaster.setFromCamera(mouse, camera);
+		  //console.log("mouse.x = " + mouse.x + " mouse.y" + mouse.y);
+		  //console.log("plane.position.x = " + plane.position.x);
+		  //console.log("plane.position.y = " + plane.position.y);
+		  plane.position.x = mouse.x * 100;
+		  plane.position.y = mouse.y * 100;
+		}
+		</script>
+	</body>
+</html>
