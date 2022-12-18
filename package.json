@@ -1,0 +1,25 @@
+{
+  "name": "callshellwithserverandthree",
+  "version": "1.0.0",
+  "description": "main.js will run a http server in http://127.0.0.1:1337",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "shelljs": "^0.5.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-mac": "node main-mac.js",
+    "start-win": "node main-win.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kakatsudon/I4A29_3W3D_HW.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kakatsudon/I4A29_3W3D_HW/issues"
+  },
+  "homepage": "https://github.com/kakatsudon/I4A29_3W3D_HW#readme"
+}
