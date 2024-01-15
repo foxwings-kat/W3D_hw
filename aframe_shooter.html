@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> My First HTML Page </title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.slim.js"></script>
+    <script src="https://unpkg.com/open-easyrtc@^2.0.5/api/easyrtc.js"></script>
+    <script src="https://unpkg.com/networked-aframe@^0.10.0/dist/networked-aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.misc.min.js"></script>
+    <script src="https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@^4.1.1/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.1/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/MozillaReality/ammo.js@8bbc0ea/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
+  </head>
+  <body >
+    <!----start_shooting_range_minigame---->
+    	<script>
+    		AFRAME.registerComponent('start_shooting_range_minigame',{
+    			init: function (){
+					var btn_lock = false;
+    				var thisEL = this.el;
+    				var sceneEL= document.querySelector('a-scene');
+    				function createRandomTarget () {
+    					function getRandomInt (min,max) {
+    						min = Math.ceil(min);
+    						max = Math.floor(max);
+    						return Math.floor(Math.random() * (max - min) + min); 
+    					}
+    					var randX = getRandomInt(-10,10);
+    					var randY = getRandomInt(2,10);
+    					var randZ = getRandomInt(-10,-30);
+    					var entityEL = document.createElement('a-entity');
+    					entityEL.classList.add("target")
+    					entityEL.setAttribute('collide_detect',{
+    						hp: 1});
+    					entityEL.setAttribute('geometry',{
+    						primitive: 'sphere',
+    						height: 1,
+    						width: 1
+    					});
+    					entityEL.setAttribute('material','color','yellow');
+    					entityEL.setAttribute('position',{x: randX,y: randY,z:randZ});
+    					entityEL.setAttribute('ammo-body','type: static; emitCollisionEvents: true;');
+    					entityEL.setAttribute('ammo-shape','type: sphere; fit: manual;sphereRadius: 2;');
+    					sceneEL.appendChild(entityEL)
+    					setTimeout(() => {sceneEL.removeChild(entityEL)},2000);
+    					setTimeout(() => {entityEL.remove();},2000);
+    				}
+    				thisEL.addEventListener("mouseenter", () => {mouseonbtn()});
+    				function mouseonbtn () {
+    					document.addEventListener("keydown", function keydownAction(event){
+    						if ((event.key == "e") && (btn_lock==false)) {
+								btn_lock = true;
+    							thisEL.setAttribute('material','color','red');
+    							thisEL.object3D.position.y=thisEL.object3D.position.y-0.2;
+    							for (var i=0; i<10; i++)  {
+    								setTimeout(() => {createRandomTarget()},(i * 2000));
+    							}
+    							setTimeout(() => {thisEL.setAttribute('material','color','green'); btn_lock = false},20000);
+    							setTimeout(() => {thisEL.object3D.position.y=thisEL.object3D.position.y+0.2;},20000);
+    						}
+    					});
+    				thisEL.addEventListener("mouseleave", this.removeEventListener("keydown",keydownAction));
+    				}
+    			}
+    		});
+    	</script>
+    <!----start_shooting_range_minigame---->
+    <!----holdtoshoot---->
+    <script>
+    /* global AFRAME, THREE */
+    AFRAME.registerComponent('holdtoshoot', {
+      schema: {
+    	bulletSpeed: {default: 50},
+        bulletTemplate: {default: '#bullet-template'},
+        triggerMethod: {default: 1} , //0 key, 1 LMB
+        triggerKey: {default: ' '} // spacebar
+      },
+    
+      init: function() {
+    	this.pullthetrigger=0;
+    	if(this.data.triggerMethod==0){
+    		document.body.addEventListener('keydown', this.onKeyDown.bind(this))
+    		document.body.addEventListener('keyup', this.onKeyUp.bind(this))
+    	}else{
+    		document.body.addEventListener('mousedown', this.onLMBDown.bind(this))
+    		document.body.addEventListener('mouseup', this.onLMBUp.bind(this))
+    	}
+    	  
+      },
+      onKeyDown: function (e) {
+      	if (e.key == this.data.triggerKey) {
+      		this.pullthetrigger=1;
+      	}
+      },
+      onKeyUp: function (e) {
+      	if (e.key == this.data.triggerKey) {
+      		this.pullthetrigger=0;
+      	}
+      },
+      onLMBDown: function (e) {
+      	if (e.which == 1) {
+      		this.pullthetrigger=1;
+      	}
+      },
+      onLMBUp: function (e) {
+      	if (e.which == 1) {
+      		this.pullthetrigger=0;
+      	}
+      },
+      tick: function (time, timeDelta) {
+      	if(this.pullthetrigger == 1){
+      		this.shoot();
+      	}
+      },
+      
+      shoot: function() {
+        this.createBullet();
+      },
+    
+      createBullet: function() {
+        var el = document.createElement('a-entity');
+        el.setAttribute('networked', 'template:' + this.data.bulletTemplate);
+        el.setAttribute('remove-in-seconds', 2);
+        el.setAttribute('forward', 'speed:'+ this.data.bulletSpeed);
+    
+        var tip = this.el;
+        el.setAttribute('position', this.getInitialBulletPosition(tip));
+        el.setAttribute('rotation', this.getInitialBulletRotation(tip));
+    
+        document.querySelector('a-scene').appendChild(el);
+      },
+    
+      getInitialBulletPosition: function(spawnerEl) {
+        var worldPos = new THREE.Vector3();
+        worldPos.setFromMatrixPosition(spawnerEl.object3D.matrixWorld);
+        return worldPos;
+      },
+    
+      getInitialBulletRotation: function(spawnerEl) {
+        var worldDirection = new THREE.Vector3();
+    
+        spawnerEl.object3D.getWorldDirection(worldDirection);
+        worldDirection.multiplyScalar(-1);
+        this.vec3RadToDeg(worldDirection);
+    
+        return worldDirection;
+      },
+    
+      vec3RadToDeg: function(rad) {
+    	var camera_el = document.querySelector("#camera");	//用白癡方法改了一下
+        rad.set(camera_el.getAttribute('rotation').x , -90 + (-THREE.Math.radToDeg(Math.atan2(rad.z, rad.x))), 0);
+      }
+    });
+    /* global AFRAME */
+    AFRAME.registerComponent('remove-in-seconds', {
+      schema: {
+        default: 1
+      },
+    
+      init: function() {
+        setTimeout(this.destroy.bind(this), this.data * 1000);
+      },
+    
+      destroy: function() {
+        var el = this.el;
+    	if(el.parentNode)
+        el.parentNode.removeChild(el);
+      }
+    });
+    /* global AFRAME, THREE */
+    AFRAME.registerComponent('forward', {
+      schema: {
+        speed: {default: 0.1},
+      },
+    
+      init: function() {
+        var worldDirection = new THREE.Vector3();
+    
+        this.el.object3D.getWorldDirection(worldDirection);
+        worldDirection.multiplyScalar(-1);
+    
+        this.worldDirection = worldDirection;
+      },
+    
+      tick: function() {
+        var el = this.el;
+    
+        var currentPosition = el.getAttribute('position');
+        var newPosition = this.worldDirection
+          .clone()
+          .multiplyScalar(this.data.speed)
+          .add(currentPosition);
+        el.setAttribute('position', newPosition);
+      }
+    });
+    </script>
+    <!----holdtoshoot---->
+    
+    
+    <!-- Bullet -->
+            <template id="bullet-template">
+              <a-entity>
+                <a-sphere class="bullet" scale="0.5 0.5 0.5" color="orange" ammo-body="type: kinematic; emitCollisionEvents: true;mass:1;gravity: 0 -2 0 ;" ammo-shape="type: sphere"></a-sphere>
+              </a-entity>
+            </template>
+    <!----collideDetect---->
+    <script>
+    	AFRAME.registerComponent('collide_detect', {
+    	schema: {
+    		hp: {default:1}
+    		},
+    	
+    	init: function() {
+    		var hp=this.data.hp;
+    		var collideDamage=1;
+    		var el = this.el; 
+    		
+    		var explosion = document.createElement('a-entity');
+    		explosion.setAttribute('gltf-model','#explosion_model');
+    		explosion.setAttribute('scale','1 1 1');
+    		explosion.setAttribute('animation-mixer','');
+    		
+    		el.addEventListener("collidestart", function(e) {
+    			console.log(el.id+" has collided with body #" + e.detail.targetEl.id+" Hp:"+hp);
+    			hp--;
+    			e.detail.targetEl; // Other entity, which playerEl touched.
+    			
+    			if(hp<=0 ){
+    				console.log(el.id+'is dead');
+    				el.appendChild(explosion);
+    
+    				var n = document.querySelector('#score');
+          				var new_score = parseInt(n.getAttribute('value'))+1;
+          				n.setAttribute('value',new_score);			//跟之前的一樣要記得加對應text
+    
+    				if(el.id=='player'){
+    					setTimeout(() => {
+    						des_fighterjet_player();
+    						}, 250);
+    				}else{
+    					setTimeout(() => {
+    					if(e.target.parentNode){e.target.parentNode.removeChild(e.target);}
+    						}, 250);
+    				}
+    			}
+    		});
+    	}});</script>
+    <!----collideDetect---->
+    		<a-asset-item id="explosion_model" src="http://drhong.ddns.net/files/gltf/timeframe_explosion/scene.gltf"></a-asset-item>
+    
+     <a-scene physics="driver: ammo;"><a-camera position="0 2 0" look-controls="pointerLockEnabled: true;" id="camera"><a-ring color="green" position="0 0 -1" radius-inner="0.01" radius-outer="0.015" id="cursor" cursor ></a-ring>
+    <a-box color="red" position="1 0 -1" holdtoshoot="bulletTemplate:#bullet-template;bulletSpeed:5;triggerMethod: 1;" id="gun" scale="0.5 0.5 2" ></a-box></a-camera>
+    <a-cylinder color="green" position="1 0.5 -5" scale="0.5 1 0.5" start_shooting_range_minigame ></a-cylinder>
+    <a-box color="black" position="0 -5 0" scale="100 100 10" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
+    <a-box color="yellow" position="0 -2 -5" scale="100 5 5" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
+    <a-sky src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/71eeef2d-6d2f-4799-a0d0-469308125783/d6h6gkp-590c6916-43b9-40ff-a650-35518b849ce2.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzcxZWVlZjJkLTZkMmYtNDc5OS1hMGQwLTQ2OTMwODEyNTc4M1wvZDZoNmdrcC01OTBjNjkxNi00M2I5LTQwZmYtYTY1MC0zNTUxOGI4NDljZTIuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.IFVlxpzCKjJfKT5tXerSgTSddRxq8H81-SMIgkHZLU4"></a-sky>
+    <a-text value="score" position="2 2 -5"></a-text>
+    <a-text value="0" position="3 2 -5" id="score"></a-text></a-scene>
+  </body>
+</html>
