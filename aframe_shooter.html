@@ -250,15 +250,14 @@
     		});
     	}});</script>
     <!----collideDetect---->
-    		<a-asset-item id="explosion_model" src="http://drhong.ddns.net/files/gltf/timeframe_explosion/scene.gltf"></a-asset-item>
-    
-     <a-scene physics="driver: ammo;"><a-camera position="0 2 0" look-controls="pointerLockEnabled: true;" id="camera"><a-ring color="green" position="0 0 -1" radius-inner="0.01" radius-outer="0.015" id="cursor" cursor ></a-ring>
-    <a-box color="red" position="1 0 -1" holdtoshoot="bulletTemplate:#bullet-template;bulletSpeed:5;triggerMethod: 1;" id="gun" scale="0.5 0.5 2" ></a-box></a-camera>
-    <a-cylinder color="green" position="1 0.5 -5" scale="0.5 1 0.5" start_shooting_range_minigame ></a-cylinder>
-    <a-box color="black" position="0 -5 0" scale="100 100 10" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
-    <a-box color="yellow" position="0 -2 -5" scale="100 5 5" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
-    <a-sky src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/71eeef2d-6d2f-4799-a0d0-469308125783/d6h6gkp-590c6916-43b9-40ff-a650-35518b849ce2.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzcxZWVlZjJkLTZkMmYtNDc5OS1hMGQwLTQ2OTMwODEyNTc4M1wvZDZoNmdrcC01OTBjNjkxNi00M2I5LTQwZmYtYTY1MC0zNTUxOGI4NDljZTIuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.IFVlxpzCKjJfKT5tXerSgTSddRxq8H81-SMIgkHZLU4"></a-sky>
-    <a-text value="score" position="2 2 -5"></a-text>
-    <a-text value="0" position="3 2 -5" id="score"></a-text></a-scene>
+    	<a-asset-item id="explosion_model" src="http://drhong.ddns.net/files/gltf/timeframe_explosion/scene.gltf"></a-asset-item>
+	<a-scene physics="driver: ammo;"><a-camera position="0 2 0" look-controls="pointerLockEnabled: true;" id="camera"><a-ring color="green" position="0 0 -1" radius-inner="0.01" radius-outer="0.015" id="cursor" cursor ></a-ring>
+    	<a-box color="red" position="1 0 -1" holdtoshoot="bulletTemplate:#bullet-template;bulletSpeed:5;triggerMethod: 1;" id="gun" scale="0.5 0.5 2" ></a-box></a-camera>
+    	<a-cylinder color="green" position="1 0.5 -5" scale="0.5 1 0.5" start_shooting_range_minigame ></a-cylinder>
+    	<a-box color="black" position="0 -5 0" scale="100 100 10" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
+    	<a-box color="yellow" position="0 -2 -5" scale="100 5 5" rotation="-90 0 0" ammo-body="type:static; emitCollisionEvents:true;" ></a-box>
+    	<a-sky src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/71eeef2d-6d2f-4799-a0d0-469308125783/d6h6gkp-590c6916-43b9-40ff-a650-35518b849ce2.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzcxZWVlZjJkLTZkMmYtNDc5OS1hMGQwLTQ2OTMwODEyNTc4M1wvZDZoNmdrcC01OTBjNjkxNi00M2I5LTQwZmYtYTY1MC0zNTUxOGI4NDljZTIuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.IFVlxpzCKjJfKT5tXerSgTSddRxq8H81-SMIgkHZLU4"></a-sky>
+    	<a-text value="score" position="2 2 -5"></a-text>
+	<a-text value="0" position="3 2 -5" id="score"></a-text></a-scene>
   </body>
 </html>
