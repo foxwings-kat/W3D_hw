@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <title> My First HTML Page </title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.misc.min.js"></script>
+    <script src="https://unpkg.com/super-hands@2.1.0/dist/super-hands.min.js"></script>
+    <script src="https://unpkg.com/aframe-fps-look-controls-component/dist/aframe-fps-look-controls-component.min.js"></script>
+    <script src="//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
+    <script>document.addEventListener('keydown', function (event){document.querySelectorAll('.listenonkey').forEach(function (obj){if ((event.keyCode == 90)) {
+        obj.setAttribute('color','blue');
+    }
+    if ((event.keyCode == 88)) {
+        obj.setAttribute('color','red');
+    }
+    if ((event.keyCode == 67)) {
+        obj.setAttribute('color','green');
+    }});})
+    AFRAME.registerComponent('log',{schema:{type: 'string'},init: function (){var stringToLog = this.data		;
+    console.log(stringToLog);}});
+    AFRAME.registerComponent('foo',{init: function (){console.log(this.el			);}});
+    AFRAME.registerComponent('query-selector-example',{init: function (){console.log(sceneEL);
+    this.entities=sceneEL.querySelectorAll('*');
+    for(let step = 0; step <this.entities.length; step++){console.log(this.entities[step].id);}}});
+    AFRAME.registerComponent('change-color-on-hover',{schema:{'color':{default:'red'}},init: function (){var data = this.data;
+    var el = this.el			;
+    var defaultColor = el.getAttribute('material').color;
+    el.addEventListener('mouseenter', function(){el.setAttribute('color',data.color);});
+    el.addEventListener('mouseleave', function(){el.setAttribute('color',defaultColor);});}});
+    AFRAME.registerComponent('change-scale-on-hover',{schema:{'scale':{default:'100,100,1'}},init: function (){var data = this.data;
+    var el = this.el			;
+    var defaultX = el.getAttribute('scale')['x'];
+    var defaultY = el.getAttribute('scale')['y'];
+    var defaultZ = el.getAttribute('scale')['z'];
+    el.addEventListener('click', function(){el.setAttribute('scale',{x: 10, y: 10, z: 3});});
+    el.addEventListener('mouseleave', function(){el.setAttribute('scale',{x: defaultX,y: defaultY,z:defaultZ});});}});</script>
+  </head>
+  <body >
+     <a-scene physics foo query-selector-example log="This is scene"><a-assets> <a-asset-item id="model1" src="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf" ></a-asset-item> </a-assets>
+    <a-entity movement-controls="fly: true"
+    ><a-entity progressive-controls><a-entity camera fps-look-controls wasd-controls ><a-entity cursor geometry="primitive: ring; radiusOuter: 0.015;radiusInner: 0.005; segmentsTheta: 32" material="color: white; shader: flat" raycaster="far: 30" position="0 0 -0.75"></a-entity></a-entity></a-entity></a-entity>
+    <a-entity ><a-box log="This is box" foo id="default box" color="crimson" position="1 2 -5" hoverable  grabbable stretchable  draggable  dropppable change-color-on-hover="color: blue" dynamic-body="mass: 1"></a-box>
+    <a-entity gltf-model="#model1" position="1 0 -5" animation-mixer></a-entity>
+    <a-video position="-2 5 -7" src="https://cdn.aframe.io/videos/bunny.mp4" scale="5 5 1" change-scale-on-hover=></a-video>
+    <a-box color="crimson" grabbable dynamic-body></a-box>
+    <a-box class="listenonkey" grabbable dynamic-body></a-box>
+    <a-box dynamic-body="mass: 1" position="2 2 -5" scale="1 1 1"></a-box>
+    <a-sphere dynamic-body="mass: 1" position="3 2 -5" scale="1 1 1" grabbable change-color-on-hover="color: blue"></a-sphere>
+    <a-plane static-body color="black" position="0 -0.1 0" scale="100 100 10" rotation="-90 0 0"></a-plane></a-entity></a-scene>
+  </body>
+</html>
+<script>var sceneEL = document.querySelector('a-scene');</script>
