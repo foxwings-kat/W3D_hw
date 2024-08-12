@@ -175,7 +175,7 @@ function init() {
 		map: new THREE.TextureLoader().load("https://i.imgur.com/t1jSNhp.png")
 	}));
 	paint4.position.set(0,500,1995);
-	createLight(new THREE.Vector3(0,990,1200), paint4);
+	createLight(new THREE.Vector3(0,990,1500), paint4);
 	paint4.rotation.y = Math.PI;
 	
 	var paint5 = new THREE.Mesh(new THREE.PlaneGeometry(600, 500), new THREE.MeshLambertMaterial({
@@ -371,6 +371,7 @@ function animate() {
 
 class spotlights {
 	constructor(position, target) {
+	this.distance = 3000;
     this.myStatus = true;
     this.brightness = 50;
     this.spotLight = new THREE.SpotLight(0xffffff, this.brightness / 50, 1500, Math.PI / 6, 0.98, 0.5);
@@ -396,7 +397,7 @@ class spotlights {
     } else {
       this.myStatus = true;
       this.brightness = brightness;
-      this.spotLight.intensity = this.brightness / 50;
+      this.spotLight.intensity = this.brightness / 20;
       document.querySelector('#lightBrightness').value = this.brightness;
     }
   }
