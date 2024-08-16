@@ -1,0 +1,11 @@
+Model Information:
+* title:	F-35E Panther
+* source:	https://sketchfab.com/3d-models/f-35e-panther-26ec07daef9b49f9948307ec295317b5
+* author:	shangus930 (https://sketchfab.com/shangus930)
+
+Model License:
+* license type:	CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
+* requirements:	Author must be credited. Modified versions must have the same license. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "F-35E Panther" (https://sketchfab.com/3d-models/f-35e-panther-26ec07daef9b49f9948307ec295317b5) by shangus930 (https://sketchfab.com/shangus930) licensed under CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)

@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> My First HTML Page </title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.slim.js"></script>
+    <script src="https://unpkg.com/open-easyrtc@^2.0.5/api/easyrtc.js"></script>
+    <script src="https://unpkg.com/networked-aframe@^0.10.0/dist/networked-aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.misc.min.js"></script>
+    <script src="https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@^4.1.1/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.1/dist/aframe-environment-component.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
+    
+  </head>
+  <body >
+    <!----fighterjet---->
+    <script>
+		AFRAME.registerComponent('fighterjet', {
+			init: function () {
+				window.addEventListener('keydown', this.onKeyDown.bind(this))
+				window.addEventListener('keyup', this.onKeyUp.bind(this))
+				this.pull = 0;  // Analog, -1 down, +1 up
+				this.roll = 0;
+				this.rotating = 0;  // Analog, -1 left, +1 right
+				this.speeding = 0;  // Analog, -1 slower, +1 faster
+				this.speed = 0.0
+				this.maxSpeed = 400;  // m/s
+				this.rotationRate = Math.PI / 5;  // radian/s
+				this.pullRate = Math.PI / 5;  // radian/s
+				this.rollRate = Math.PI / 2;  // radian/s
+				this.speedIncrement = 10  // m/s^2;  
+			},
+			onAxisMoveSpeed: function(e) {
+				// Negate because Gamepad API axis "forward" is -1.
+				this.speeding = -e.detail.axis[1];
+			},
+			onAxisMoveAngle: function(e) {
+				this.rotating = e.detail.axis[0];
+			},
+			onAxisMovePull: function(e) {
+				this.pull = e.detail.axis[3];
+			},
+			onAxisMoveRoll: function(e) {
+				this.roll = e.detail.axis[2];
+			},
+			onKeyDown: function (e) {
+				if (e.keyCode == 65) {
+				this.rotating = 1;
+				} else if (e.keyCode == 68) {
+				this.rotating = -1;
+				} else if (e.keyCode == 87) {
+				this.speeding = -1;
+				} else if (e.keyCode == 83) {
+				this.speeding = 1;
+				} else if (e.key == 'k') {
+				this.pull = 1;
+				} else if (e.key == 'i') {
+				this.pull = -1;
+				} else if (e.key == 'j') {
+				this.roll = 1;
+				} else if (e.key == 'l') {
+				this.roll = -1;
+				}
+			},
+			onKeyUp: function (e) {
+				if (e.keyCode == 65 || e.keyCode == 68) {
+				this.rotating = 0
+				} else if (e.keyCode == 87 || e.keyCode == 83) {
+				this.speeding = 0
+				} else if (e.key == 'i' || e.key == 'k') {
+				this.pull = 0
+				} else if (e.key == 'l' || e.key == 'j') {
+				this.roll = 0
+				}
+			},
+			tick: function (time, timeDelta) {
+				// Cap the time delta to avoid unreasonable jumps after pauses.
+				let deltaSeconds = Math.min(timeDelta / 1000, 1/30);
+				// console.log('deltaSeconds', deltaSeconds, 'from', timeDelta);
+				if (Math.abs(this.speed) > 2 && this.rotating != 0) {
+				const direction = this.speed > 0 ? 1 : -1;
+				this.el.object3D.rotateY(-direction * this.rotating * this.rotationRate * deltaSeconds)
+				}
+				if (Math.abs(this.speed) > 20 && this.pull != 0) {
+				const direction = this.speed > 0 ? 1 : -1;
+				this.el.object3D.rotateX(-direction * this.pull * this.pullRate * deltaSeconds)
+				}
+				if (Math.abs(this.speed) > 20 && this.roll != 0) {
+				const direction = this.speed > 0 ? 1 : -1;
+				this.el.object3D.rotateZ(-direction * this.roll * this.rollRate * deltaSeconds)
+				}
+				if (this.speeding != 0) {
+				this.speed = this.speed + this.speeding * this.speedIncrement * deltaSeconds;
+				if (this.speeding > 0) {
+					this.speed = Math.min(this.speed, this.maxSpeed);
+				} else {
+					this.speed = Math.max(this.speed, -this.maxSpeed);
+				}
+				}
+				const position = this.el.getAttribute('position')
+				const rotation = this.el.getAttribute('rotation')
+				const angle = Math.PI * rotation.y / 180
+				const pull = Math.PI * rotation.x / 180
+				const roll = Math.PI * rotation.z / 180
+				//if (this.speed != 0) console.log(this.speeding, this.speed, angle);
+				position.x += this.speed * Math.sin(angle) * deltaSeconds;
+				position.z += this.speed * Math.cos(angle) * deltaSeconds;
+				
+				position.y -= this.speed * Math.sin(pull) * deltaSeconds;
+				
+				this.el.setAttribute('position', position)
+				if (this.speeding == 0 && this.speed > 0) {
+				this.speed = Math.max(this.speed - this.speedIncrement * deltaSeconds / 2, 0)
+				}
+				if (this.speeding == 0 && this.speed < 0) {
+				this.speed = Math.min(this.speed + this.speedIncrement * deltaSeconds / 2, 0)
+				}
+			}
+        })
+        
+        AFRAME.registerComponent('fighterjet-controller-left', {
+          init: function () {
+            this.el.addEventListener('axismove', function (e) {
+              const fighterjet = document.querySelector('[player_rig]').components.fighterjet
+              fighterjet.onAxisMoveSpeed(e)
+            })
+          }
+        })
+        
+        AFRAME.registerComponent('fighterjet-controller-right', {
+          init: function () {
+            this.el.addEventListener('axismove', function (e) {
+              const fighterjet = document.querySelector('[player_rig]').components.fighterjet
+              fighterjet.onAxisMoveAngle(e)
+            })
+          }
+        })
+    	
+    	
+        AFRAME.registerComponent('fighterjet-controller-up', {
+          init: function () {
+            this.el.addEventListener('axismove', function (e) {
+              const fighterjet = document.querySelector('[player_rig]').components.fighterjet
+              fighterjet.onAxisMoveSpeed(e)
+            })
+          }
+        })
+        
+        AFRAME.registerComponent('fighterjet-controller-down', {
+          init: function () {
+            this.el.addEventListener('axismove', function (e) {
+              const fighterjet = document.querySelector('[player_rig]').components.fighterjet
+              fighterjet.onAxisMovePull(e)
+            })
+          }
+        })
+    
+        AFRAME.registerComponent('fighterjet-controller-two-axis', {
+          init: function () {
+            this.el.addEventListener('axismove', (ev) => {
+              const fighterjet = document.querySelector('[player_rig]').components.fighterjet;
+              fighterjet.onAxisMoveAngle(ev);
+              fighterjet.onAxisMoveSpeed(ev);
+            });
+          }
+        })
+    	</script>
+    	<!----fighterjet---->
+    		
+        <!----network---->
+    	<script>
+			// see issue https://github.com/networked-aframe/networked-aframe/issues/267
+			NAF.schemas.getComponentsOriginal = NAF.schemas.getComponents;
+			NAF.schemas.getComponents = (template) => {
+				if (!NAF.schemas.hasTemplate('#fighter-jet-template')) {
+					NAF.schemas.add({
+					template: '#fighter-jet-template',
+					selector: '.target',
+					components: [
+						'position',
+						'rotation'
+					]
+					});
+				}
+				const components = NAF.schemas.getComponentsOriginal(template);
+				return components;
+			};
+        </script>
+    	<!----network---->
+    	<!----spawn---->
+    	<script>
+    		var spawn_btn= document.createElement('button');
+    				spawn_btn.setAttribute('id','spawn_btn');
+    				spawn_btn.setAttribute('style','z-index:10;display:flex;position:fixed;top:1vmin;left:1vmin;');
+    				spawn_btn.setAttribute('onclick','spawn_fighterjet_player()');
+    				spawn_btn.innerHTML='spawn';
+    				document.body.appendChild(spawn_btn);
+    		function spawn_fighterjet_player(){
+    			//player
+    			var player = document.createElement('a-entity');
+    			player.setAttribute('id','player');
+    			player.setAttribute('networked','template:#fighter-jet-template;attachTemplateToLocal:false;');
+    			player.setAttribute('rotation','0 0 0');
+    			player.setAttribute('ammo-body','type: kinematic; emitCollisionEvents: true;mass:1;gravity: 0 -1 0 ;');
+    			player.setAttribute('ammo-shape','type: box; fit: manual; halfExtents:10 5 12');
+    			player.setAttribute('collide_detect','hp:2;');
+    			player.setAttribute('fighterjet','');
+    				//rig
+    				var rig = document.createElement('a-entity');
+    				rig.setAttribute('gltf-model','#fighter-jet');
+    				rig.setAttribute('rotation','0 180 0');
+    				rig.setAttribute('scale','2 2 2');
+    				player.appendChild(rig);
+    					//gun
+    					var gunL = document.createElement('a-entity');
+    					gunL.setAttribute('id','gunL');
+    					gunL.setAttribute('position','1 0 10');
+    					gunL.setAttribute('rotation','0 180 0');
+    					gunL.setAttribute('holdtoshoot','bulletTemplate:#bullet-template;gunid:#gunL');
+    					
+    					var flareL = document.createElement('a-entity');
+    					flareL.setAttribute('id','flareL');
+    					flareL.setAttribute('position','1 0 -8');
+    					flareL.setAttribute('rotation','0 -45 0');
+    					flareL.setAttribute('launch_flare','bulletTemplate:#flare-template;gunid:#flareL');
+    					rig.appendChild(gunL);
+    					rig.appendChild(flareL);
+    					
+    					var gunR = document.createElement('a-entity');
+    					gunR.setAttribute('id','gunR');
+    					gunR.setAttribute('position','-1 0 10');
+    					gunR.setAttribute('rotation','0 -180 0');
+    					gunR.setAttribute('target_tracker','playerId:#player; targetClass:.target; inRangeDistance:200;gunid:#gunR;');
+    					gunR.setAttribute('holdtoshoot','bulletTemplate:#bullet-template;gunid:#gunR');
+    					
+    					var flareR = document.createElement('a-entity');
+    					flareR.setAttribute('id','flareR');
+    					flareR.setAttribute('position','-1 0 -8');
+    					flareR.setAttribute('rotation','0 45 0');
+    					gunR.setAttribute('launch_flare','bulletTemplate:#flare-template;gunid:#flareR');
+    					rig.appendChild(gunR);
+    					rig.appendChild(flareR);
+    					//cursor
+    					var fighterjet_cursor = document.createElement('a-entity');
+    					fighterjet_cursor.setAttribute('id','fighterjet_cursor');
+    					fighterjet_cursor.setAttribute('position','0 0.6 30');
+    					fighterjet_cursor.setAttribute('rotation','0 180 0');
+    					fighterjet_cursor.setAttribute('geometry','primitive','ring');
+    					fighterjet_cursor.setAttribute('geometry','radiusOuter','0.5');
+    					fighterjet_cursor.setAttribute('geometry','radiusInner','0.42');
+    					fighterjet_cursor.setAttribute('geometry','segmentsTheta','32');
+    					fighterjet_cursor.setAttribute('material','color','#019E2D');
+    					fighterjet_cursor.setAttribute('material','shader','flat');
+    					fighterjet_cursor.setAttribute('raycaster','objects','.raycastable');
+    					rig.appendChild(fighterjet_cursor);
+    				//camera
+    				var player_camera = document.createElement('a-entity');
+    				player_camera.setAttribute('id','player_camera');
+    				player_camera.setAttribute('position','0 1.6 -8.7');
+    				player_camera.setAttribute('look-controls','pointerLockEnabled','true');
+    				player_camera.setAttribute('camera','');
+    				player_camera.setAttribute('cameraperspective','');
+    				player.appendChild(player_camera);
+    			document.querySelector('a-scene').appendChild(player);
+    			
+    			spawn_btn=document.querySelector('#spawn_btn'); 
+    			spawn_btn.remove();
+    			
+    			var self_destruct_btn= document.createElement('button');
+    			self_destruct_btn.setAttribute('id','self_destruct_btn');
+    			self_destruct_btn.setAttribute('style','z-index:10;display:flex;position:fixed;top:1vmin;left:1vmin;');
+    			self_destruct_btn.setAttribute('onclick','des_fighterjet_player()');
+    			self_destruct_btn.innerHTML='self_destruct';
+    			document.body.appendChild(self_destruct_btn);
+    		}
+    	</script>
+    	<!----spawn---->
+    	
+    	<!----self_destruction---->
+    	<script>
+    		function des_fighterjet_player(){
+    			if(document.querySelector('#player')){
+    				player=document.querySelector('#player');
+    				player.remove();
+    				
+    				self_destruct_btn=document.querySelector('#self_destruct_btn'); 
+    				self_destruct_btn.remove();
+    			
+    				var spawn_btn= document.createElement('button');
+    				spawn_btn.setAttribute('id','spawn_btn');
+    				spawn_btn.setAttribute('style','z-index:10;display:flex;position:fixed;top:1vmin;left:1vmin;');
+    				spawn_btn.setAttribute('onclick','spawn_fighterjet_player()');
+    				spawn_btn.innerHTML='spawn';
+    				document.body.appendChild(spawn_btn);
+    			}
+    		}
+    	</script>
+    	<!----self_destruction---->
+    	<a-asset-item id="fighter-jet" src="./gltf/plane/scene.gltf"></a-asset-item>
+    	<!-- Avatar -->
+    	<template id="fighter-jet-template">
+    			<a-entity  id="Avatar" class="target"
+    				ammo-body="type: kinematic; emitCollisionEvents: true;mass:1;gravity: 0 -9 0 ;" ammo-shape="type: box; fit: manual; halfExtents:10 5 12 ">
+    				<a-entity  id="rig" gltf-model="#fighter-jet" rotation="0 180 0" scale="2 2 2"  >
+    				</a-entity>
+    			</a-entity>
+    	</template>
+    	<!-- Avatar -->
+		<!----cameraPerspective---->
+        <script>
+            AFRAME.registerComponent('cameraperspective', {
+                    init: function () {
+                    window.addEventListener('keydown', this.onKeyDown.bind(this))
+                    this.view = 0; 
+                    this.position=this.el.object3D.position; 
+                    this.ogposition=new THREE.Vector3().copy(this.position); 
+                },
+                onKeyDown: function (e) { 
+                    
+                    if (e.key == "v") {
+                        if(this.view == 0){
+                            this.view = 1; 
+                            this.position.set(0,8,32);
+                        }else if(this.view == 1){
+                            this.view = 2; 
+                            this.position.set(0,20,40);
+                        }else if(this.view == 2){
+                            this.view = 0; 
+                            this.position.copy(this.ogposition);
+                        }
+                }
+                }
+			})
+        </script>
+        <!----cameraPerspective---->
+    <a-scene physics="driver:ammo;" id="scene"><a-entity environment="preset:forest; " position="0 -2 0" scale="10 10 10"></a-entity></a-scene>
+  </body>
+</html>
